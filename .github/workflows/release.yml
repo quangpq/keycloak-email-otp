@@ -29,7 +29,7 @@ jobs:
           prerelease: false
           release_name: ${{ steps.version.outputs.version }}
           tag_name: ${{ github.ref }}
-          body: https://github.com/5-stones/keycloak-email-otp/blob/main/CHANGELOG.md
+          body: https://github.com/quangpq/keycloak-email-otp/blob/main/CHANGELOG.md
         env:
           GITHUB_TOKEN: ${{ github.token }}
 

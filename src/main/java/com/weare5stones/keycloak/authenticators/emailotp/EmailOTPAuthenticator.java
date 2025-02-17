@@ -21,6 +21,7 @@ import org.keycloak.sessions.AuthenticationSessionModel;
 public class EmailOTPAuthenticator implements Authenticator {
 
   private static final String TOTP_FORM = "totp-form.ftl";
+  private static final String TOTP_FORM_KEYWIND = "totp-form-keywind.ftl";
   private static final String TOTP_EMAIL = "totp-email.ftl";
   private static final String AUTH_NOTE_CODE = "code";
   private static final String AUTH_NOTE_TTL = "ttl";
@@ -78,7 +79,8 @@ public class EmailOTPAuthenticator implements Authenticator {
                 attributes);
       }
 
-      context.challenge(context.form().setAttribute("realm", context.getRealm()).createForm(TOTP_FORM));
+      context.challenge(
+          context.form().setAttribute("realm", context.getRealm()).createForm(getLoginForm(context.getRealm())));
     } catch (Exception e) {
       logger.error("An error occurred when attempting to email an TOTP auth:", e);
       context.failureChallenge(AuthenticationFlowError.INTERNAL_ERROR,
@@ -127,7 +129,7 @@ public class EmailOTPAuthenticator implements Authenticator {
             context.form()
                 .setAttribute("realm", context.getRealm())
                 .setError("emailTOTPCodeInvalid", Integer.toString(remainingAttempts))
-                .createForm(TOTP_FORM));
+                .createForm(getLoginForm(context.getRealm())));
       } else {
         context.failure(AuthenticationFlowError.INVALID_CREDENTIALS);
       }
@@ -150,6 +152,10 @@ public class EmailOTPAuthenticator implements Authenticator {
 
   @Override
   public void close() {
+  }
+
+  private String getLoginForm(RealmModel realm) {
+    return realm.getLoginTheme().equalsIgnoreCase("keywind")  ? TOTP_FORM_KEYWIND : TOTP_FORM;
   }
 
   private int getMaxRetries(AuthenticatorConfigModel config) {
